@@ -1,0 +1,17 @@
+{
+  "connections": {
+    "TAG_NAME_1": {
+      "host": "epp.nominet.org.uk",
+      "port": 700,
+      "password": "password-here"
+    },
+    "TAG_NAME_2": {
+      "host": "epp.nominet.org.uk",
+      "port": 700,
+      "password": "password-here"
+    }
+  },
+  "api_key": "apikeyhere",
+  "api_url": "urloripaddress",
+  "api_port" : 5000
+}

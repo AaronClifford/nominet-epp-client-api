@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp
+	xmlns="urn:ietf:params:xml:ns:epp-1.0">
+	<command>
+		<create>
+			<domain:create
+				xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+				<domain:name>{domain_name}</domain:name>
+				<domain:period unit="y">{reg_period}</domain:period>
+				<domain:registrant>{contact_id}</domain:registrant>
+				<domain:authInfo>
+					<domain:pw></domain:pw>
+				</domain:authInfo>
+			</domain:create>
+		</create>
+		<clTRID>{cltrid}</clTRID>
+	</command>
+</epp>
