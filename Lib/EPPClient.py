@@ -83,15 +83,26 @@ class EPPClient:
             return None
 
     def _parse_xml_to_dict(self, xml_response):
+        """Parse XML response into a dictionary, handling namespaces."""
         try:
             root = ET.fromstring(xml_response)
-            response_dict = {root.tag: {}}
+            response_dict = {}
 
-            for child in root:
-                response_dict[root.tag][child.tag] = child.text
+            ns = {'epp': 'urn:ietf:params:xml:ns:epp-1.0'}
 
-                if list(child):
-                    response_dict[root.tag][child.tag] = self._parse_element(child)
+            result_element = root.find('.//epp:result', ns)
+            if result_element is not None:
+                response_dict['result'] = {
+                    'code': result_element.get('code'),
+                    'msg': result_element.find('epp:msg', ns).text if result_element.find('epp:msg', ns) is not None else None
+                }
+
+            tr_id_element = root.find('.//epp:trID', ns)
+            if tr_id_element is not None:
+                response_dict['trID'] = {
+                    'clTRID': tr_id_element.find('epp:clTRID', ns).text if tr_id_element.find('epp:clTRID', ns) is not None else None,
+                    'svTRID': tr_id_element.find('epp:svTRID', ns).text if tr_id_element.find('epp:svTRID', ns) is not None else None
+                }
 
             return response_dict
         except ET.ParseError as e:
