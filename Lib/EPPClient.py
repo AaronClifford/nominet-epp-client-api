@@ -88,27 +88,36 @@ class EPPClient:
             root = ET.fromstring(xml_response)
             response_dict = {}
 
+            # Define the namespace based on the XML's xmlns attribute
             ns = {'epp': 'urn:ietf:params:xml:ns:epp-1.0'}
+            logger.debug(f"Parsing XML response with namespaces: {ns}")
 
+            # Extract relevant fields, like result code and message
             result_element = root.find('.//epp:result', ns)
             if result_element is not None:
                 response_dict['result'] = {
                     'code': result_element.get('code'),
                     'msg': result_element.find('epp:msg', ns).text if result_element.find('epp:msg', ns) is not None else None
                 }
+                logger.debug(f"Extracted result: {response_dict['result']}")
+            else:
+                logger.error("Failed to find the <result> element in the XML response.")
 
+            # Extract transaction IDs
             tr_id_element = root.find('.//epp:trID', ns)
             if tr_id_element is not None:
                 response_dict['trID'] = {
                     'clTRID': tr_id_element.find('epp:clTRID', ns).text if tr_id_element.find('epp:clTRID', ns) is not None else None,
                     'svTRID': tr_id_element.find('epp:svTRID', ns).text if tr_id_element.find('epp:svTRID', ns) is not None else None
                 }
+                logger.debug(f"Extracted trID: {response_dict['trID']}")
+            else:
+                logger.error("Failed to find the <trID> element in the XML response.")
 
             return response_dict
         except ET.ParseError as e:
             logger.error(f"Failed to parse XML: {e}")
             return None
-
     def _parse_element(self, element):
         elem_dict = {}
         for child in element:
