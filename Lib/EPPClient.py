@@ -73,15 +73,17 @@ class EPPClient:
             logger.debug(f"Sending EPP command from {command_file}: {xml}")
             self.sock.sendall(xml.encode('utf-8'))
             response = self._read_response()
+
+            if command_name == "login":
+                return response
+
             logger.debug(f"Received response: {response}")
             
-            # Parse the response with regex
             result_code = re.search(r'<result code=\"(\d+)\"', response)
             message = re.search(r'<msg>(.*?)</msg>', response)
             cltrid = re.search(r'<clTRID>(.*?)</clTRID>', response)
             svtrid = re.search(r'<svTRID>(.*?)</svTRID>', response)
 
-            # Create a JSON object with the extracted data
             response_json = {
                 "result_code": result_code.group(1) if result_code else "",
                 "message": message.group(1) if message else "",
@@ -89,7 +91,7 @@ class EPPClient:
                 "svtrid": svtrid.group(1) if svtrid else ""
             }
 
-            return json.dumps(response_json)  # Return the JSON object as a string
+            return json.dumps(response_json)
 
         except Exception as e:
             logger.error(f"Failed to send EPP command from {command_file}: {e}")
