@@ -46,7 +46,7 @@ class EPPClient:
             except socket.timeout:
                 break
         return response.decode('utf-8', errors='ignore')
-            
+        
     def send_epp_command(self, command_name, replacements=None):
         replacements = replacements or {}
 
@@ -73,39 +73,37 @@ class EPPClient:
             logger.debug(f"Sending EPP command from {command_file}: {xml}")
             self.sock.sendall(xml.encode('utf-8'))
             response = self._read_response()
-
-            print("-------------- RESPONSE -----------")
-            print(response)
-
-            result_code = re.search(r'<result code=\"(\d+)\"', response)
-            message = re.search(r'<msg>(.*?)</msg>', response)
-            cltrid = re.search(r'<clTRID>(.*?)</clTRID>', response)
-            svtrid = re.search(r'<svTRID>(.*?)</svTRID>', response)
-
-            if "success" in response:
-                response_json = {
-                    "result_code": result_code.group(1) if result_code else "",
-                    "message": message.group(1) if message else "",
-                    "cltrid": cltrid.group(1) if cltrid else "",
-                    "svtrid": svtrid.group(1) if svtrid else "",
-                    "response_info" : "success"
-                }
-                print(response_json)
-            else:
-                response_json = {
-                    "result_code": result_code.group(1) if result_code else "",
-                    "message": message.group(1) if message else "",
-                    "cltrid": cltrid.group(1) if cltrid else "",
-                    "svtrid": svtrid.group(1) if svtrid else "",
-                    "response_info" : "failed"
-                }
-                print(response_json)
-
-            return json.dumps(response_json)
-
+            logger.debug(f"Received response: {response}")
+            parsed_response = self._parse_xml_to_dict(response)
+            return parsed_response
         except Exception as e:
             logger.error(f"Failed to send EPP command from {command_file}: {e}")
             return None
+
+    def _parse_xml_to_dict(self, xml_response):
+        try:
+            root = ET.fromstring(xml_response)
+            response_dict = {root.tag: {}}
+
+            for child in root:
+                response_dict[root.tag][child.tag] = child.text
+
+                if list(child):
+                    response_dict[root.tag][child.tag] = self._parse_element(child)
+
+            return response_dict
+        except ET.ParseError as e:
+            logger.error(f"Failed to parse XML: {e}")
+            return None
+
+    def _parse_element(self, element):
+        elem_dict = {}
+        for child in element:
+            if list(child):
+                elem_dict[child.tag] = self._parse_element(child)
+            else:
+                elem_dict[child.tag] = child.text
+        return elem_dict
 
     def command(self, command_name, **kwargs):
         return self.send_epp_command(command_name, kwargs)

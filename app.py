@@ -24,12 +24,12 @@ def initialize_epp_clients():
         client = EPPClient(host, port)
         app.logger.info(f"Connecting to EPP server for {username} at {host}:{port}")
         login_response = client.command('login', username=username, password=password)
-        
-        if login_response["response_info"] == "success":
+
+        if login_response and login_response.get('response', {}).get('result', {}).get('code') == '1000':
             clients[username] = client
             app.logger.info(f"Successfully logged in for {username}")
         else:
-            app.logger.error(f"Failed to login for {username}")
+            app.logger.error(f"Failed to login for {username}: {login_response}")
 
 @app.route('/renewDomain', methods=['POST'])
 def renew_domain():
@@ -67,7 +67,7 @@ def renew_domain():
         )
 
         if renewal_response:
-            return jsonify({"response": renewal_response}), 200
+            return jsonify(renewal_response), 200
         else:
             return jsonify({"error": "Failed to renew domain"}), 500
 
