@@ -74,6 +74,7 @@ class EPPClient:
             self.sock.sendall(xml.encode('utf-8'))
             response = self._read_response()
             logger.debug(f"Received response: {response}")
+            print(response)
             parsed_response = self._parse_xml_to_dict(response)
             print(parsed_response)
             return parsed_response
