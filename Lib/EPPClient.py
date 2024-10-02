@@ -6,6 +6,7 @@ import random
 from logging.handlers import TimedRotatingFileHandler
 from datetime import datetime
 import xml.etree.ElementTree as ET
+import re
 
 log_folder = 'logs'
 os.makedirs(log_folder, exist_ok=True)
