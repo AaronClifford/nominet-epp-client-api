@@ -46,54 +46,54 @@ class EPPClient:
             except socket.timeout:
                 break
         return response.decode('utf-8', errors='ignore')
-        
-def send_epp_command(self, command_name, replacements=None):
-    replacements = replacements or {}
+            
+    def send_epp_command(self, command_name, replacements=None):
+        replacements = replacements or {}
 
-    if 'cltrid' not in replacements:
-        replacements['cltrid'] = str(random.randint(100000, 999999))
+        if 'cltrid' not in replacements:
+            replacements['cltrid'] = str(random.randint(100000, 999999))
 
-    command_file = f"{command_name}.xml"
-    command_path = os.path.join('commands', command_file)
+        command_file = f"{command_name}.xml"
+        command_path = os.path.join('commands', command_file)
 
-    try:
-        with open(command_path, 'r') as file:
-            xml = file.read()
+        try:
+            with open(command_path, 'r') as file:
+                xml = file.read()
 
-        if 'ns' in replacements:
-            ns_list = replacements['ns']
+            if 'ns' in replacements:
+                ns_list = replacements['ns']
 
-            ns_xml = "".join([f"<domain:hostObj>{ns}</domain:hostObj>" for ns in ns_list])
-            xml = xml.replace("{ns}", ns_xml)
+                ns_xml = "".join([f"<domain:hostObj>{ns}</domain:hostObj>" for ns in ns_list])
+                xml = xml.replace("{ns}", ns_xml)
 
-        for key, value in replacements.items():
-            if key != 'ns':
-                xml = xml.replace(f'{{{key}}}', value)
+            for key, value in replacements.items():
+                if key != 'ns':
+                    xml = xml.replace(f'{{{key}}}', value)
 
-        logger.debug(f"Sending EPP command from {command_file}: {xml}")
-        self.sock.sendall(xml.encode('utf-8'))
-        response = self._read_response()
-        logger.debug(f"Received response: {response}")
-        
-        # Parse the response with regex
-        result_code = re.search(r'<result code=\"(\d+)\"', response)
-        message = re.search(r'<msg>(.*?)</msg>', response)
-        cltrid = re.search(r'<clTRID>(.*?)</clTRID>', response)
-        svtrid = re.search(r'<svTRID>(.*?)</svTRID>', response)
+            logger.debug(f"Sending EPP command from {command_file}: {xml}")
+            self.sock.sendall(xml.encode('utf-8'))
+            response = self._read_response()
+            logger.debug(f"Received response: {response}")
+            
+            # Parse the response with regex
+            result_code = re.search(r'<result code=\"(\d+)\"', response)
+            message = re.search(r'<msg>(.*?)</msg>', response)
+            cltrid = re.search(r'<clTRID>(.*?)</clTRID>', response)
+            svtrid = re.search(r'<svTRID>(.*?)</svTRID>', response)
 
-        # Create a JSON object with the extracted data
-        response_json = {
-            "result_code": result_code.group(1) if result_code else "",
-            "message": message.group(1) if message else "",
-            "cltrid": cltrid.group(1) if cltrid else "",
-            "svtrid": svtrid.group(1) if svtrid else ""
-        }
+            # Create a JSON object with the extracted data
+            response_json = {
+                "result_code": result_code.group(1) if result_code else "",
+                "message": message.group(1) if message else "",
+                "cltrid": cltrid.group(1) if cltrid else "",
+                "svtrid": svtrid.group(1) if svtrid else ""
+            }
 
-        return json.dumps(response_json)  # Return the JSON object as a string
+            return json.dumps(response_json)  # Return the JSON object as a string
 
-    except Exception as e:
-        logger.error(f"Failed to send EPP command from {command_file}: {e}")
-        return None
+        except Exception as e:
+            logger.error(f"Failed to send EPP command from {command_file}: {e}")
+            return None
 
     def command(self, command_name, **kwargs):
         return self.send_epp_command(command_name, kwargs)
