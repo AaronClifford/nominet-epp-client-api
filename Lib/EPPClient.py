@@ -74,7 +74,6 @@ class EPPClient:
             self.sock.sendall(xml.encode('utf-8'))
             response = self._read_response()
 
-            print(command_name)
             if command_name == "login":
                 return response
 
