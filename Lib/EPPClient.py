@@ -74,26 +74,29 @@ class EPPClient:
             self.sock.sendall(xml.encode('utf-8'))
             response = self._read_response()
 
-            if command_name == "login":
-                return response
-
-            logger.debug(f"Received response: {response}")
-
-            print(response)
-            
             result_code = re.search(r'<result code=\"(\d+)\"', response)
             message = re.search(r'<msg>(.*?)</msg>', response)
             cltrid = re.search(r'<clTRID>(.*?)</clTRID>', response)
             svtrid = re.search(r'<svTRID>(.*?)</svTRID>', response)
 
-            response_json = {
-                "result_code": result_code.group(1) if result_code else "",
-                "message": message.group(1) if message else "",
-                "cltrid": cltrid.group(1) if cltrid else "",
-                "svtrid": svtrid.group(1) if svtrid else ""
-            }
-
-            print(response_json)
+            if "success" in response:
+                response_json = {
+                    "result_code": result_code.group(1) if result_code else "",
+                    "message": message.group(1) if message else "",
+                    "cltrid": cltrid.group(1) if cltrid else "",
+                    "svtrid": svtrid.group(1) if svtrid else "",
+                    "response_info" : "success"
+                }
+                print(response_json)
+            else:
+                response_json = {
+                    "result_code": result_code.group(1) if result_code else "",
+                    "message": message.group(1) if message else "",
+                    "cltrid": cltrid.group(1) if cltrid else "",
+                    "svtrid": svtrid.group(1) if svtrid else "",
+                    "response_info" : "failed"
+                }
+                print(response_json)
 
             return json.dumps(response_json)
 

@@ -25,7 +25,7 @@ def initialize_epp_clients():
         app.logger.info(f"Connecting to EPP server for {username} at {host}:{port}")
         login_response = client.command('login', username=username, password=password)
         
-        if "success" in login_response.lower():
+        if login_response["response_info"] == "success":
             clients[username] = client
             app.logger.info(f"Successfully logged in for {username}")
         else:
