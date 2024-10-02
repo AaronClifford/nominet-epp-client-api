@@ -79,6 +79,8 @@ class EPPClient:
             cltrid = re.search(r'<clTRID>(.*?)</clTRID>', response)
             svtrid = re.search(r'<svTRID>(.*?)</svTRID>', response)
 
+            print(response)
+
             if "success" in response:
                 response_json = {
                     "result_code": result_code.group(1) if result_code else "",
