@@ -47,10 +47,10 @@ class EPPClient:
                 break
         response_str = response.decode('utf-8', errors='ignore')
 
-    cleaned_response = re.sub(r'[^\x20-\x7E]+', '', response_str)
-    logger.debug(f"Cleaned response: {cleaned_response}")
+        cleaned_response = re.sub(r'[^\x20-\x7E]+', '', response_str)
+        logger.debug(f"Cleaned response: {cleaned_response}")
 
-    return cleaned_response
+        return cleaned_response
         
     def send_epp_command(self, command_name, replacements=None):
         replacements = replacements or {}
