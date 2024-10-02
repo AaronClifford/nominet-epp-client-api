@@ -74,15 +74,13 @@ class EPPClient:
             self.sock.sendall(xml.encode('utf-8'))
             response = self._read_response()
 
+            print("-------------- RESPONSE -----------")
             print(response)
 
             result_code = re.search(r'<result code=\"(\d+)\"', response)
             message = re.search(r'<msg>(.*?)</msg>', response)
             cltrid = re.search(r'<clTRID>(.*?)</clTRID>', response)
             svtrid = re.search(r'<svTRID>(.*?)</svTRID>', response)
-
-            print("info here")
-            print(result_code,message,cltrid,svtrid)
 
             if "success" in response:
                 response_json = {
