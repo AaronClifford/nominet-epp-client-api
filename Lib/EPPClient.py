@@ -75,6 +75,7 @@ class EPPClient:
             response = self._read_response()
             logger.debug(f"Received response: {response}")
             parsed_response = self._parse_xml_to_dict(response)
+            print(parsed_response)
             return parsed_response
         except Exception as e:
             logger.error(f"Failed to send EPP command from {command_file}: {e}")
