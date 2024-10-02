@@ -100,7 +100,6 @@ def set_ns():
 
     if not keep_ns:
         response = client.command('info', domain_name=domain_name)
-        print(response)
         if not response:
             return jsonify({"error": "Failed to retrieve current nameservers"}), 500
         

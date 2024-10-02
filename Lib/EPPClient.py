@@ -78,6 +78,8 @@ class EPPClient:
                 return response
 
             logger.debug(f"Received response: {response}")
+
+            print(response)
             
             result_code = re.search(r'<result code=\"(\d+)\"', response)
             message = re.search(r'<msg>(.*?)</msg>', response)
@@ -90,6 +92,8 @@ class EPPClient:
                 "cltrid": cltrid.group(1) if cltrid else "",
                 "svtrid": svtrid.group(1) if svtrid else ""
             }
+
+            print(response_json)
 
             return json.dumps(response_json)
 
