@@ -74,6 +74,8 @@ class EPPClient:
             self.sock.sendall(xml.encode('utf-8'))
             response = self._read_response()
 
+            print(response)
+
             result_code = re.search(r'<result code=\"(\d+)\"', response)
             message = re.search(r'<msg>(.*?)</msg>', response)
             cltrid = re.search(r'<clTRID>(.*?)</clTRID>', response)
